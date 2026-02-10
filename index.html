@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Mural Encantado 🎀</title>
+    <style>
+        /* CONFIGURAÇÃO VISUAL (CSS) */
+        body { 
+            background-color: #ffe5ec; 
+            background-image: radial-gradient(#ffb3c1 1px, transparent 1px);
+            background-size: 40px 40px;
+            font-family: 'Comic Sans MS', 'cursive', sans-serif; 
+            text-align: center; 
+            color: #fb6f92; 
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 { 
+            font-size: 2.5em; 
+            text-shadow: 2px 2px white;
+            margin: 20px 0;
+        }
+
+        .ursinho-decor { font-size: 50px; }
+
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 30px; 
+            padding: 20px;
+        }
+        
+        /* Estilo do Card de Foto */
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 20px; 
+            border: 8px double #ffb3c1; 
+            box-shadow: 0 10px 20px rgba(251, 111, 146, 0.2); 
+            width: 280px; 
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        /* O Laço em cima de cada foto */
+        .card::before {
+            content: "🎀";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            z-index: 10;
+        }
+        
+        .card img { 
+            width: 100%; 
+            height: 230px; 
+            object-fit: cover; 
+            border-radius: 10px;
+            border: 2px solid #ffe5ec;
+        }
+        
+        .editable-text { 
+            margin-top: 15px; 
+            padding: 10px; 
+            min-height: 40px;
+            background-color: #fff0f3;
+            border-radius: 10px;
+            outline: none; 
+            font-size: 1.1em;
+            color: #890023;
+            border: 1px dashed #fb6f92;
+        }
+
+        /* Botão de Adicionar */
+        .btn-add {
+            background-color: #fb6f92; 
+            color: white; 
+            border: 4px solid #ffb3c1;
+            padding: 15px 40px; 
+            border-radius: 50px; 
+            font-weight: bold;
+            cursor: pointer; 
+            font-size: 18px; 
+            margin: 20px 0;
+            box-shadow: 0 5px 0 #c9184a;
+        }
+
+        .btn-add:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #c9184a;
+        }
+
+        .btn-delete {
+            position: absolute; 
+            top: 5px; 
+            right: 5px; 
+            background: #ffb3c1;
+            color: white; 
+            border: none; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        #file-input { display: none; }
+
+        footer { margin-top: 50px; font-size: 1.2em; padding-bottom: 30px;}
+    </style>
+</head>
+<body>
+
+    <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+        <span class="ursinho-decor">🧸</span>
+        <h1>Nosso Álbum de Memórias</h1>
+        <span class="ursinho-decor">🧸</span>
+    </div>
+    
+    <input type="file" id="file-input" accept="image/*" onchange="handleImage(this)">
+    <button class="btn-add" onclick="document.getElementById('file-input').click()">
+        💖 Adicionar Nova Memória 💖
+    </button>
+
+    <div class="container" id="mural">
+        </div>
+
+    <footer>🌷 Cada detalhe importa quando estou com você 🌷</footer>
+
+    <script>
+        /* LÓGICA DE FUNCIONAMENTO (JAVASCRIPT) */
+
+        // 1. Carregar o que já foi salvo assim que abrir a página
+        document.addEventListener('DOMContentLoaded', loadMural);
+
+        // 2. Processar a foto escolhida na galeria
+        function handleImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    addCardToDOM(base64Image, "Clique para escrever algo carinhoso...");
+                    saveMural(); // Salva no banco de dados do navegador
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 3. Criar o visual do card na tela
+        function addCardToDOM(imgSrc, text) {
+            const mural = document.getElementById('mural');
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <button class="btn-delete" onclick="removeCard(this)">×</button>
+                <img src="${imgSrc}">
+                <div class="editable-text" contenteditable="true" oninput="saveMural()">
+                    ${text}
+                </div>
+                <div style="margin-top:10px; font-size: 12px;">🌸✨🌸</div>
+            `;
+            mural.appendChild(card);
+        }
+
+        // 4. Salvar tudo no LocalStorage (Memória do navegador)
+        function saveMural() {
+            const data = [];
+            document.querySelectorAll('.card').forEach(card => {
+                data.push({
+                    img: card.querySelector('img').src,
+                    txt: card.querySelector('.editable-text').innerText
+                });
+            });
+            localStorage.setItem('mural_final_romantico', JSON.stringify(data));
+        }
+
+        // 5. Ler os dados salvos ao atualizar a página
+        function loadMural() {
+            const saved = localStorage.getItem('mural_final_romantico');
+            if (saved) {
+                const cards = JSON.parse(saved);
+                cards.forEach(item => addCardToDOM(item.img, item.txt));
+            }
+        }
+
+        // 6. Remover foto e atualizar memória
+        function removeCard(btn) {
+            if(confirm("Deseja apagar essa memória preciosa? 🥺")) {
+                btn.parentElement.remove();
+                saveMural();
+            }
+        }
+    </script>
+</body>
+</html>
