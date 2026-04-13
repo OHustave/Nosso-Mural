@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <!-- Firebase Setup Overlay -->
     <div id="firebase-overlay" style="display:none;">
         <div class="firebase-setup glass-card">
@@ -42,13 +43,11 @@
                 <input type="text" id="fb-storageBucket" class="input-field" placeholder="storageBucket">
                 <input type="text" id="fb-messagingSenderId" class="input-field" placeholder="messagingSenderId">
                 <input type="text" id="fb-appId" class="input-field" placeholder="appId">
-
-
-
                 <button id="fb-save-btn" class="btn btn-primary" style="margin-top:8px;">Conectar ao Firebase &#x1F525;</button>
             </div>
         </div>
     </div>
+
     <!-- Welcome Screen -->
     <div id="welcome-screen" style="display:none;">
         <div class="welcome-content glass-card">
@@ -56,10 +55,6 @@
                 <div class="welcome-hearts">&#x1F495;</div>
                 <p class="welcome-sub">Carregando...</p>
             </div>
-
-
-
-
             <div id="setup-form" style="display:none;">
                 <h1>Nosso Mural</h1>
                 <p class="welcome-sub">Configure seu mural de memorias</p>
@@ -80,11 +75,11 @@
             </div>
         </div>
     </div>
+
     <!-- Identity Modal -->
     <div id="identity-modal" class="identity-overlay" style="display:none;">
         <div class="identity-modal-content glass-card">
             <div class="welcome-hearts">&#x1F464;</div>
-
             <h3 class="identity-title">Quem e voce?</h3>
             <p class="identity-subtitle">Identifique-se para que suas postagens fiquem marcadas</p>
             <div class="identity-btns">
@@ -99,6 +94,7 @@
             </div>
         </div>
     </div>
+
     <!-- Navbar -->
     <nav id="navbar" class="navbar glass-card" style="display:none;">
         <div class="nav-brand" id="nav-brand">&#x1F495; Nosso Mural</div>
@@ -127,6 +123,7 @@
             <button id="settings-btn" class="btn-icon" title="Configuracoes">&#x2699;&#xFE0F;</button>
         </div>
     </nav>
+
     <!-- Main Content -->
     <main id="main-content" style="display:none;">
         <section id="home" class="section">
@@ -216,6 +213,7 @@
             <p id="log-empty" class="empty-msg" style="display:none;">Nenhuma atividade registrada.</p>
         </section>
     </main>
+
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" style="display:none;">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
@@ -224,6 +222,7 @@
         <img id="lightbox-img" class="lightbox-img" src="" alt="">
         <p id="lightbox-caption" class="lightbox-caption"></p>
     </div>
+
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content glass-card">
@@ -251,6 +250,7 @@
             </div>
         </div>
     </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
     <!-- Floating Hearts Container -->
@@ -259,6 +259,7 @@
     <footer id="footer" class="footer" style="display:none;">
         <p>Feito com &#x2764;&#xFE0F; por <span id="footer-names">Nos</span></p>
     </footer>
+
     <!-- Firebase SDK (compat mode) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>

@@ -1,6 +1,10 @@
+/* ==========================================
+   NOSSO MURAL DE MEMORIAS - SCRIPT
+   Firebase Realtime Database + All Features
+   ========================================== */
 (function () {
   "use strict";
- 
+
   /* ---------- helpers ---------- */
   var $ = function (s, p) { return (p || document).querySelector(s); };
   var $$ = function (s, p) { return Array.from((p || document).querySelectorAll(s)); };
@@ -21,7 +25,7 @@
     d.textContent = s;
     return d.innerHTML;
   }
- 
+
   /* ---------- state ---------- */
   var db = null;           // firebase.database() reference
   var state = {
@@ -38,18 +42,27 @@
   var lightboxPhotos = [];
   var lightboxIdx = 0;
   var counterInterval = null;
- 
+
   /* ==========================================
      FIREBASE
      ========================================== */
   function getFirebaseConfig() {
-    try { return JSON.parse(localStorage.getItem("fbConfig")); } catch (e) { return null; }
+    return {
+      apiKey: "AIzaSyBiWcEOtg4c5-BwjShrKx-0BxiW3XvavEs",
+      authDomain: "teste-b38b5.firebaseapp.com",
+      databaseURL: "https://teste-b38b5-default-rtdb.firebaseio.com",
+      projectId: "teste-b38b5",
+      storageBucket: "teste-b38b5.firebasestorage.app",
+      messagingSenderId: "404183604492",
+      appId: "1:404183604492:web:18a052b946e0f78097fd29",
+      measurementId: "G-GCCXQF89Z2"
+    };
   }
- 
+
   function saveFirebaseConfig(cfg) {
     localStorage.setItem("fbConfig", JSON.stringify(cfg));
   }
- 
+
   function initFirebase(cfg) {
     if (!window.firebase) { toast("Firebase SDK nao carregado. Recarregue a pagina.", "error"); return false; }
     try {
@@ -63,35 +76,35 @@
       return false;
     }
   }
- 
+
   function fbSet(path, val) {
     if (!db) return Promise.resolve();
     return db.ref(path).set(val);
   }
- 
+
   function fbPush(path, val) {
     if (!db) return Promise.resolve();
     var ref = db.ref(path).push();
     return ref.set(val).then(function () { return ref.key; });
   }
- 
+
   function fbRemove(path) {
     if (!db) return Promise.resolve();
     return db.ref(path).remove();
   }
- 
+
   function fbUpdate(path, val) {
     if (!db) return Promise.resolve();
     return db.ref(path).update(val);
   }
- 
+
   function fbListen(path, cb) {
     if (!db) return;
     db.ref(path).on("value", function (snap) {
       cb(snap.val() || {});
     });
   }
- 
+
   /* ==========================================
      TOAST
      ========================================== */
@@ -105,7 +118,7 @@
     setTimeout(function () { t.style.opacity = "0"; t.style.transform = "translateX(100%)"; }, 2800);
     setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 3200);
   }
- 
+
   /* ==========================================
      ACTIVITY LOG
      ========================================== */
@@ -113,7 +126,7 @@
     var entry = { id: uid(), icon: icon, detail: detail, time: ts(), person: currentPerson || "?" };
     fbPush("log", entry);
   }
- 
+
   function renderLog(data) {
     state.log = data || {};
     var list = $("#log-list");
@@ -128,7 +141,7 @@
         '</span><span class="log-time">' + fmtTime(l.time) + '</span></div>';
     }).join("");
   }
- 
+
   /* ==========================================
      IDENTITY
      ========================================== */
@@ -136,14 +149,14 @@
     if (!state.config) return "Pessoa " + p;
     return p === "1" ? (state.config.name1 || "Pessoa 1") : (state.config.name2 || "Pessoa 2");
   }
- 
+
   function showIdentityModal() {
     var modal = $("#identity-modal");
     $("#identity-name-1").textContent = getPersonName("1");
     $("#identity-name-2").textContent = getPersonName("2");
     modal.style.display = "flex";
   }
- 
+
   function pickIdentity(p) {
     currentPerson = p;
     localStorage.setItem("currentPerson", p);
@@ -151,7 +164,7 @@
     updateIdentityIndicator();
     toast("Voce esta como " + getPersonName(p), "success");
   }
- 
+
   function updateIdentityIndicator() {
     var ind = $("#identity-indicator");
     if (!currentPerson) { ind.style.display = "none"; return; }
@@ -160,7 +173,7 @@
     dot.className = "identity-dot person-" + currentPerson;
     $("#identity-name-display").textContent = getPersonName(currentPerson);
   }
- 
+
   /* ==========================================
      NAVIGATION
      ========================================== */
@@ -178,7 +191,7 @@
     var hb = $("#hamburger");
     if (hb) hb.classList.remove("active");
   }
- 
+
   /* ==========================================
      DARK MODE
      ========================================== */
@@ -187,7 +200,7 @@
     if (saved === "dark") applyTheme("dark");
     else applyTheme("light");
   }
- 
+
   function applyTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
     localStorage.setItem("theme", t);
@@ -201,12 +214,12 @@
       if (label) label.textContent = "Escuro";
     }
   }
- 
+
   function toggleTheme() {
     var cur = document.documentElement.getAttribute("data-theme");
     applyTheme(cur === "dark" ? "light" : "dark");
   }
- 
+
   /* ==========================================
      FLOATING HEARTS
      ========================================== */
@@ -223,7 +236,7 @@
     c.appendChild(h);
     setTimeout(function () { if (h.parentNode) h.parentNode.removeChild(h); }, 12000);
   }
- 
+
   /* ==========================================
      LOVE QUOTES
      ========================================== */
@@ -239,13 +252,13 @@
     "Contigo, ate o silencio fala.",
     "Voce e o sonho que eu nao quero acordar."
   ];
- 
+
   function randomQuote() {
     var q = quotes[Math.floor(Math.random() * quotes.length)];
     var el = $("#love-quote");
     if (el) el.textContent = '"' + q + '"';
   }
- 
+
   /* ==========================================
      COUNTER (days together)
      ========================================== */
@@ -254,14 +267,14 @@
     updateCounter();
     counterInterval = setInterval(updateCounter, 1000);
   }
- 
+
   function updateCounter() {
     if (!state.config || !state.config.startDate) return;
     var start = new Date(state.config.startDate + "T00:00:00");
     var now = new Date();
     var diff = now - start;
     if (diff < 0) diff = 0;
- 
+
     var totalSec = Math.floor(diff / 1000);
     var days = Math.floor(totalSec / 86400);
     var hours = Math.floor((totalSec % 86400) / 3600);
@@ -269,7 +282,7 @@
     var secs = totalSec % 60;
     var months = Math.floor(days / 30);
     var years = Math.floor(days / 365);
- 
+
     var grid = $("#counter-grid");
     if (grid) {
       grid.innerHTML =
@@ -280,16 +293,16 @@
         counterCard(mins, "Minutos") +
         counterCard(secs, "Segundos");
     }
- 
+
     var wc = $("#welcome-counter");
     if (wc) wc.textContent = days + " dias juntos";
   }
- 
+
   function counterCard(val, label) {
     return '<div class="counter-item glass-card"><div class="counter-value">' + val +
       '</div><div class="counter-label">' + label + '</div></div>';
   }
- 
+
   /* ==========================================
      STATS
      ========================================== */
@@ -301,7 +314,7 @@
     if (sm) sm.textContent = Object.keys(state.messages).length;
     if (smu) smu.textContent = Object.keys(state.music).length;
   }
- 
+
   /* ==========================================
      GALLERY (photos as base64)
      ========================================== */
@@ -309,7 +322,7 @@
     var files = e.target.files;
     if (!files || files.length === 0) return;
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
- 
+
     Array.from(files).forEach(function (file) {
       if (file.size > 800000) {
         toast("Foto muito grande (max 800KB): " + file.name, "error");
@@ -334,7 +347,7 @@
     });
     e.target.value = "";
   }
- 
+
   function renderGallery(data) {
     state.photos = data || {};
     updateStats();
@@ -344,7 +357,7 @@
     var filterVal = $(".filter-btns .btn-sm.active");
     var filter = filterVal ? filterVal.getAttribute("data-filter") : "all";
     var items = Object.entries(state.photos);
- 
+
     // search filter
     if (searchVal.trim()) {
       var q = searchVal.toLowerCase();
@@ -356,12 +369,12 @@
     }
     // sort newest first
     items.sort(function (a, b) { return (b[1].date || "").localeCompare(a[1].date || ""); });
- 
+
     if (items.length === 0) { grid.innerHTML = ""; empty.style.display = ""; return; }
     empty.style.display = "none";
- 
+
     lightboxPhotos = items.map(function (e) { return { key: e[0], src: e[1].src, caption: e[1].caption }; });
- 
+
     grid.innerHTML = items.map(function (e, idx) {
       var key = e[0], p = e[1];
       var badge = personBadge(p.person);
@@ -378,11 +391,11 @@
         '</div></div></div>';
     }).join("");
   }
- 
+
   function personBadge(p) {
     return getPersonName(p);
   }
- 
+
   /* gallery event delegation */
   function onGalleryClick(e) {
     var tgt = e.target;
@@ -417,21 +430,21 @@
       openLightbox(idx);
     }
   }
- 
+
   function findFbKey(collection, id) {
     // photos are stored with firebase push keys as outer key, and item has .id field
     // but we stored using fbPush which uses firebase key as the outer key
     // In renderGallery we use Object.entries so key = firebase push key
     return id; // the key IS the firebase key
   }
- 
+
   function togglePhotoFav(key) {
     var items = state.photos;
     if (!items[key]) return;
     var cur = items[key].favorite;
     fbUpdate("photos/" + key, { favorite: !cur });
   }
- 
+
   function editPhotoCaption(key) {
     var items = state.photos;
     if (!items[key]) return;
@@ -440,7 +453,7 @@
     fbUpdate("photos/" + key, { caption: cap });
     addLog("\u270F\uFE0F", "editou legenda de uma foto");
   }
- 
+
   function deletePhoto(key) {
     if (!confirm("Excluir esta foto?")) return;
     fbRemove("photos/" + key).then(function () {
@@ -448,7 +461,7 @@
       toast("Foto excluida!", "info");
     });
   }
- 
+
   /* ---------- lightbox ---------- */
   function openLightbox(idx) {
     if (!lightboxPhotos.length) return;
@@ -457,26 +470,26 @@
     lb.style.display = "flex";
     updateLightbox();
   }
- 
+
   function updateLightbox() {
     var p = lightboxPhotos[lightboxIdx];
     if (!p) return;
     $("#lightbox-img").src = p.src;
     $("#lightbox-caption").textContent = p.caption || "";
   }
- 
+
   function closeLightbox() { $("#lightbox").style.display = "none"; }
- 
+
   function lightboxPrev() {
     lightboxIdx = (lightboxIdx - 1 + lightboxPhotos.length) % lightboxPhotos.length;
     updateLightbox();
   }
- 
+
   function lightboxNext() {
     lightboxIdx = (lightboxIdx + 1) % lightboxPhotos.length;
     updateLightbox();
   }
- 
+
   /* ==========================================
      VIDEOS (YouTube embed)
      ========================================== */
@@ -484,7 +497,7 @@
     var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     return m ? m[1] : null;
   }
- 
+
   function addVideo() {
     var urlEl = $("#video-url");
     var titleEl = $("#video-title");
@@ -492,10 +505,10 @@
     var title = (titleEl.value || "").trim();
     if (!url) { toast("Cole uma URL do YouTube!", "error"); return; }
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
- 
+
     var ytId = extractYoutubeId(url);
     if (!ytId) { toast("URL do YouTube invalida!", "error"); return; }
- 
+
     var video = {
       id: uid(),
       ytId: ytId,
@@ -503,7 +516,7 @@
       person: currentPerson,
       date: ts()
     };
- 
+
     fbPush("videos", video).then(function () {
       addLog("\uD83C\uDFAC", "adicionou um video: " + video.title);
       toast("Video adicionado!", "success");
@@ -511,16 +524,16 @@
       titleEl.value = "";
     });
   }
- 
+
   function renderVideos(data) {
     state.videos = data || {};
     var grid = $("#video-grid");
     var empty = $("#video-empty");
     var items = Object.entries(state.videos).sort(function (a, b) { return (b[1].date || "").localeCompare(a[1].date || ""); });
- 
+
     if (items.length === 0) { grid.innerHTML = ""; empty.style.display = ""; return; }
     empty.style.display = "none";
- 
+
     grid.innerHTML = items.map(function (e) {
       var key = e[0], v = e[1];
       var badge = '<span class="poster-badge person-' + v.person + '">' + personBadge(v.person) + '</span>';
@@ -533,7 +546,7 @@
         '</div></div>';
     }).join("");
   }
- 
+
   function onVideoGridClick(e) {
     var btn = e.target.closest(".video-del-btn");
     if (!btn) return;
@@ -544,7 +557,7 @@
       toast("Video excluido!", "info");
     });
   }
- 
+
   /* ==========================================
      MESSAGES
      ========================================== */
@@ -553,7 +566,7 @@
     var text = (input.value || "").trim();
     if (!text) { toast("Escreva uma mensagem!", "error"); return; }
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
- 
+
     var msg = {
       id: uid(),
       text: text,
@@ -561,39 +574,39 @@
       favorite: false,
       date: ts()
     };
- 
+
     fbPush("messages", msg).then(function () {
       addLog("\uD83D\uDC8C", "enviou uma mensagem");
       toast("Mensagem enviada!", "success");
       input.value = "";
     });
   }
- 
+
   function renderMessages(data) {
     state.messages = data || {};
     updateStats();
     var list = $("#messages-list");
     var empty = $("#msg-empty");
- 
+
     // get active filter
     var filterBtn = $(".msg-filters .btn-sm.active");
     var filter = filterBtn ? filterBtn.getAttribute("data-msg-filter") : "all";
- 
+
     var items = Object.entries(state.messages);
- 
+
     if (filter === "1") items = items.filter(function (e) { return e[1].person === "1"; });
     else if (filter === "2") items = items.filter(function (e) { return e[1].person === "2"; });
     else if (filter === "favorites") items = items.filter(function (e) { return e[1].favorite; });
- 
+
     items.sort(function (a, b) { return (a[1].date || "").localeCompare(b[1].date || ""); });
- 
+
     if (items.length === 0 && Object.keys(state.messages).length === 0) {
       list.innerHTML = "";
       empty.style.display = "";
       return;
     }
     empty.style.display = "none";
- 
+
     list.innerHTML = items.map(function (e) {
       var key = e[0], m = e[1];
       var authorClass = "author-" + m.person;
@@ -608,11 +621,11 @@
         '<button class="msg-delete-btn" data-key="' + key + '">\uD83D\uDDD1\uFE0F</button>' +
         '</span></div></div>';
     }).join("");
- 
+
     // auto-scroll to bottom
     list.scrollTop = list.scrollHeight;
   }
- 
+
   function onMessagesClick(e) {
     var favBtn = e.target.closest(".msg-fav-btn");
     if (favBtn) {
@@ -633,7 +646,7 @@
       }
     }
   }
- 
+
   /* ---------- emoji picker ---------- */
   var emojis = [
     "\u2764\uFE0F", "\uD83D\uDC95", "\uD83D\uDC96", "\uD83D\uDC97", "\uD83D\uDC98", "\uD83D\uDC9D",
@@ -643,7 +656,7 @@
     "\uD83C\uDF39", "\uD83C\uDF3B", "\uD83C\uDF38", "\uD83C\uDF3A", "\uD83C\uDF37", "\u2728",
     "\uD83C\uDF1F", "\uD83C\uDF08", "\uD83C\uDF1E", "\uD83C\uDF19", "\uD83D\uDCAB", "\uD83D\uDD25"
   ];
- 
+
   function initEmojiPicker() {
     var picker = $("#emoji-picker");
     if (!picker) return;
@@ -651,7 +664,7 @@
       return '<button class="emoji-btn" type="button">' + em + '</button>';
     }).join("");
   }
- 
+
   function onEmojiClick(e) {
     if (!e.target.classList.contains("emoji-btn")) return;
     var emoji = e.target.textContent;
@@ -659,7 +672,7 @@
     input.value += emoji;
     input.focus();
   }
- 
+
   /* ==========================================
      MUSIC
      ========================================== */
@@ -670,10 +683,10 @@
     var title = (titleEl.value || "").trim();
     if (!url) { toast("Cole uma URL!", "error"); return; }
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
- 
+
     var platform = "link";
     var embedUrl = "";
- 
+
     // YouTube
     var ytId = extractYoutubeId(url);
     if (ytId) {
@@ -686,9 +699,9 @@
       platform = "spotify";
       embedUrl = "https://open.spotify.com/embed/" + spMatch[1] + "/" + spMatch[2];
     }
- 
+
     if (!embedUrl) { toast("URL nao reconhecida. Use YouTube ou Spotify.", "error"); return; }
- 
+
     var song = {
       id: uid(),
       url: url,
@@ -698,7 +711,7 @@
       person: currentPerson,
       date: ts()
     };
- 
+
     fbPush("music", song).then(function () {
       addLog("\uD83C\uDFB5", "adicionou uma musica: " + song.title);
       toast("Musica adicionada!", "success");
@@ -706,17 +719,17 @@
       titleEl.value = "";
     });
   }
- 
+
   function renderMusic(data) {
     state.music = data || {};
     updateStats();
     var list = $("#playlist");
     var empty = $("#music-empty");
     var items = Object.entries(state.music).sort(function (a, b) { return (b[1].date || "").localeCompare(a[1].date || ""); });
- 
+
     if (items.length === 0) { list.innerHTML = ""; empty.style.display = ""; return; }
     empty.style.display = "none";
- 
+
     list.innerHTML = items.map(function (e) {
       var key = e[0], s = e[1];
       var icon = s.platform === "spotify" ? "\uD83C\uDFB5" : "\u25B6\uFE0F";
@@ -730,7 +743,7 @@
         '</div>';
     }).join("");
   }
- 
+
   function onPlaylistClick(e) {
     var delBtn = e.target.closest(".playlist-item-delete");
     if (delBtn) {
@@ -749,18 +762,18 @@
     if (!item) return;
     var embedUrl = item.getAttribute("data-embed");
     if (!embedUrl) return;
- 
+
     // highlight playing
     $$(".playlist-item").forEach(function (pi) { pi.classList.remove("playing"); });
     item.classList.add("playing");
- 
+
     // show player
     var player = $("#music-player");
     var container = $("#player-container");
-    container.innerHTML = '<iframe src="' + embedUrl + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen style="width:100%;height:80px;border:none;border-radius:10px;"></iframe>';
+    container.innerHTML = '<iframe src="' + embedUrl + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
     player.style.display = "";
   }
- 
+
   /* ==========================================
      TIMELINE
      ========================================== */
@@ -771,10 +784,10 @@
     var date = (dateEl.value || "").trim();
     var title = (titleEl.value || "").trim();
     var desc = (descEl.value || "").trim();
- 
+
     if (!title) { toast("Preencha o titulo!", "error"); return; }
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
- 
+
     var entry = {
       id: uid(),
       date: date || new Date().toISOString().split("T")[0],
@@ -783,7 +796,7 @@
       person: currentPerson,
       createdAt: ts()
     };
- 
+
     fbPush("timeline", entry).then(function () {
       addLog("\uD83D\uDCC5", "adicionou na timeline: " + title);
       toast("Memoria adicionada!", "success");
@@ -792,16 +805,16 @@
       descEl.value = "";
     });
   }
- 
+
   function renderTimeline(data) {
     state.timeline = data || {};
     var list = $("#timeline-list");
     var empty = $("#timeline-empty");
     var items = Object.entries(state.timeline).sort(function (a, b) { return (b[1].date || "").localeCompare(a[1].date || ""); });
- 
+
     if (items.length === 0) { list.innerHTML = ""; empty.style.display = ""; return; }
     empty.style.display = "none";
- 
+
     list.innerHTML = items.map(function (e) {
       var key = e[0], t = e[1];
       var badge = '<span class="poster-badge person-' + t.person + '">' + personBadge(t.person) + '</span>';
@@ -814,7 +827,7 @@
         '</div></div>';
     }).join("");
   }
- 
+
   function onTimelineClick(e) {
     var btn = e.target.closest(".timeline-del-btn");
     if (!btn) return;
@@ -825,7 +838,7 @@
       toast("Memoria excluida!", "info");
     });
   }
- 
+
   /* ==========================================
      SETTINGS
      ========================================== */
@@ -838,30 +851,30 @@
     }
     modal.style.display = "flex";
   }
- 
+
   function closeSettings() {
     $("#settings-modal").style.display = "none";
   }
- 
+
   function saveSettings() {
     var name1 = ($("#setting-name1").value || "").trim();
     var name2 = ($("#setting-name2").value || "").trim();
     var date = ($("#setting-date").value || "").trim();
     if (!name1 || !name2) { toast("Preencha os nomes!", "error"); return; }
- 
+
     var cfg = { name1: name1, name2: name2, startDate: date };
     fbSet("config", cfg).then(function () {
       toast("Configuracoes salvas!", "success");
       closeSettings();
     });
   }
- 
+
   function resetFirebase() {
     if (!confirm("Deseja reconfigurar o Firebase? A pagina sera recarregada.")) return;
     localStorage.removeItem("fbConfig");
     location.reload();
   }
- 
+
   /* ==========================================
      SETUP / WELCOME FLOW
      ========================================== */
@@ -871,14 +884,14 @@
     });
     $("#firebase-overlay").style.display = "flex";
   }
- 
+
   function showWelcomeScreen() {
     $("#firebase-overlay").style.display = "none";
     $("#welcome-screen").style.display = "flex";
     $("#navbar").style.display = "none";
     $("#main-content").style.display = "none";
     $("#footer").style.display = "none";
- 
+
     // Check if config exists in Firebase
     if (db) {
       db.ref("config").once("value").then(function (snap) {
@@ -898,7 +911,7 @@
       $("#setup-form").style.display = "";
     }
   }
- 
+
   function saveSetup() {
     var name1 = ($("#setup-name1").value || "").trim();
     var name2 = ($("#setup-name2").value || "").trim();
@@ -911,25 +924,25 @@
       enterApp();
     });
   }
- 
+
   function enterApp() {
     $("#welcome-screen").style.display = "none";
     $("#navbar").style.display = "flex";
     $("#main-content").style.display = "";
     $("#footer").style.display = "";
- 
+
     // update names
     if (state.config) {
       var names = state.config.name1 + " & " + state.config.name2;
       var hn = $("#home-names"); if (hn) hn.textContent = names;
       var fn = $("#footer-names"); if (fn) fn.textContent = names;
       var nb = $("#nav-brand"); if (nb) nb.innerHTML = "\uD83D\uDC95 " + names;
- 
+
       // update message filter labels
       var mf1 = $("#msg-filter-1"); if (mf1) mf1.textContent = state.config.name1;
       var mf2 = $("#msg-filter-2"); if (mf2) mf2.textContent = state.config.name2;
     }
- 
+
     // show identity modal if not set
     currentPerson = localStorage.getItem("currentPerson");
     if (!currentPerson) {
@@ -937,22 +950,22 @@
     } else {
       updateIdentityIndicator();
     }
- 
+
     // start listeners
     startFirebaseListeners();
- 
+
     // start counter, hearts, quote
     startCounter();
     randomQuote();
     setInterval(spawnHeart, 3000);
     spawnHeart();
- 
+
     showSection("home");
   }
- 
+
   function startFirebaseListeners() {
     if (!db) return;
- 
+
     fbListen("config", function (cfg) {
       if (cfg) {
         state.config = cfg;
@@ -966,7 +979,7 @@
         startCounter();
       }
     });
- 
+
     fbListen("photos", renderGallery);
     fbListen("videos", renderVideos);
     fbListen("messages", renderMessages);
@@ -974,7 +987,7 @@
     fbListen("timeline", renderTimeline);
     fbListen("log", renderLog);
   }
- 
+
   /* ==========================================
      FIREBASE SETUP OVERLAY HANDLER
      ========================================== */
@@ -995,44 +1008,37 @@
     }
     // test connection
     if (!initFirebase(cfg)) return;
- 
+
     saveFirebaseConfig(cfg);
     toast("Firebase conectado!", "success");
     showWelcomeScreen();
   }
- 
+
   /* ==========================================
      BOOT
      ========================================== */
   function boot() {
     initDarkMode();
     initEmojiPicker();
- 
+
     // Check for saved Firebase config
     var fbCfg = getFirebaseConfig();
-    if (fbCfg && fbCfg.apiKey) {
-      if (initFirebase(fbCfg)) {
-        showWelcomeScreen();
-      } else {
-        showFirebaseOverlay();
-      }
-    } else {
-      showFirebaseOverlay();
-    }
- 
+    initFirebase(fbCfg);
+    showWelcomeScreen();
+
     /* ---------- wire up event listeners ---------- */
- 
+
     // Firebase setup
     var fbSaveBtn = $("#fb-save-btn");
     if (fbSaveBtn) fbSaveBtn.addEventListener("click", saveFirebaseSetup);
- 
+
     // Welcome / setup
     var setupBtn = $("#setup-btn");
     if (setupBtn) setupBtn.addEventListener("click", saveSetup);
- 
+
     var enterBtn = $("#enter-btn");
     if (enterBtn) enterBtn.addEventListener("click", enterApp);
- 
+
     // Identity
     var idBtn1 = $("#identity-btn-1");
     if (idBtn1) idBtn1.addEventListener("click", function () { pickIdentity("1"); });
@@ -1040,7 +1046,7 @@
     if (idBtn2) idBtn2.addEventListener("click", function () { pickIdentity("2"); });
     var changeIdBtn = $("#change-identity-btn");
     if (changeIdBtn) changeIdBtn.addEventListener("click", showIdentityModal);
- 
+
     // Navigation
     $$(".nav-link").forEach(function (a) {
       a.addEventListener("click", function (e) {
@@ -1048,7 +1054,7 @@
         showSection(a.getAttribute("data-section"));
       });
     });
- 
+
     // Hamburger
     var hamburger = $("#hamburger");
     if (hamburger) {
@@ -1057,11 +1063,11 @@
         $("#nav-links").classList.toggle("open");
       });
     }
- 
+
     // Dark mode
     var dmToggle = $("#dark-mode-toggle");
     if (dmToggle) dmToggle.addEventListener("click", toggleTheme);
- 
+
     // Settings
     var settingsBtn = $("#settings-btn");
     if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
@@ -1071,7 +1077,7 @@
     if (saveSettingsBtn) saveSettingsBtn.addEventListener("click", saveSettings);
     var resetFbBtn = $("#reset-firebase");
     if (resetFbBtn) resetFbBtn.addEventListener("click", resetFirebase);
- 
+
     // Settings modal backdrop click
     var settingsModal = $("#settings-modal");
     if (settingsModal) {
@@ -1079,14 +1085,14 @@
         if (e.target === settingsModal) closeSettings();
       });
     }
- 
+
     // Gallery
     var photoInput = $("#photo-input");
     if (photoInput) photoInput.addEventListener("change", handlePhotoInput);
- 
+
     var galleryGrid = $("#gallery-grid");
     if (galleryGrid) galleryGrid.addEventListener("click", onGalleryClick);
- 
+
     // Photo search
     var photoSearch = $("#photo-search");
     if (photoSearch) {
@@ -1094,7 +1100,7 @@
         renderGallery(state.photos);
       });
     }
- 
+
     // Photo filters
     $$(".filter-btns .btn-sm").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -1103,7 +1109,7 @@
         renderGallery(state.photos);
       });
     });
- 
+
     // Lightbox
     var lbClose = $("#lightbox-close");
     if (lbClose) lbClose.addEventListener("click", closeLightbox);
@@ -1111,7 +1117,7 @@
     if (lbPrev) lbPrev.addEventListener("click", lightboxPrev);
     var lbNext = $("#lightbox-next");
     if (lbNext) lbNext.addEventListener("click", lightboxNext);
- 
+
     // Lightbox keyboard
     document.addEventListener("keydown", function (e) {
       if ($("#lightbox").style.display === "none") return;
@@ -1119,7 +1125,7 @@
       if (e.key === "ArrowLeft") lightboxPrev();
       if (e.key === "ArrowRight") lightboxNext();
     });
- 
+
     // Lightbox backdrop click
     var lightbox = $("#lightbox");
     if (lightbox) {
@@ -1127,18 +1133,18 @@
         if (e.target === lightbox) closeLightbox();
       });
     }
- 
+
     // Videos
     var addVideoBtn = $("#add-video-btn");
     if (addVideoBtn) addVideoBtn.addEventListener("click", addVideo);
- 
+
     var videoGrid = $("#video-grid");
     if (videoGrid) videoGrid.addEventListener("click", onVideoGridClick);
- 
+
     // Messages
     var sendMsgBtn = $("#send-msg-btn");
     if (sendMsgBtn) sendMsgBtn.addEventListener("click", sendMessage);
- 
+
     var msgInput = $("#msg-input");
     if (msgInput) {
       msgInput.addEventListener("keydown", function (e) {
@@ -1148,10 +1154,10 @@
         }
       });
     }
- 
+
     var msgList = $("#messages-list");
     if (msgList) msgList.addEventListener("click", onMessagesClick);
- 
+
     // Message filters
     $$(".msg-filters .btn-sm").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -1160,7 +1166,7 @@
         renderMessages(state.messages);
       });
     });
- 
+
     // Emoji
     var emojiToggle = $("#emoji-toggle");
     if (emojiToggle) {
@@ -1171,27 +1177,27 @@
     }
     var emojiPicker = $("#emoji-picker");
     if (emojiPicker) emojiPicker.addEventListener("click", onEmojiClick);
- 
+
     // Music
     var addMusicBtn = $("#add-music-btn");
     if (addMusicBtn) addMusicBtn.addEventListener("click", addMusic);
- 
+
     var playlist = $("#playlist");
     if (playlist) playlist.addEventListener("click", onPlaylistClick);
- 
+
     // Timeline
     var addTimelineBtn = $("#add-timeline-btn");
     if (addTimelineBtn) addTimelineBtn.addEventListener("click", addTimeline);
- 
+
     var timelineList = $("#timeline-list");
     if (timelineList) timelineList.addEventListener("click", onTimelineClick);
   }
- 
+
   /* ---------- run ---------- */
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
     boot();
   }
- 
+
 })();
