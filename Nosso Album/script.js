@@ -1023,9 +1023,7 @@
 
     // Firebase config is hardcoded - init and proceed to welcome screen
     var fbCfg = getFirebaseConfig();
-    if (!initFirebase(fbCfg)) {
-      toast("Erro ao conectar ao Firebase. Verifique sua conexao e recarregue a pagina.", "error");
-    }
+    initFirebase(fbCfg); // initFirebase already shows a toast on failure
     showWelcomeScreen();
 
     /* ---------- wire up event listeners ---------- */
