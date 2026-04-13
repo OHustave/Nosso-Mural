@@ -3,73 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosso Álbum de Memórias</title>
+    <title>Nosso Mural de Memorias</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Welcome Screen -->
-    <div id="welcome-screen">
-        <div class="welcome-content glass-card">
-            <div id="welcome-loading" class="welcome-loading">
-                <div class="welcome-hearts">💕</div>
-                <p class="welcome-sub">Carregando...</p>
-            </div>
-            <div id="setup-form" style="display:none;">
-                <h1>Nosso Álbum</h1>
-                <p class="welcome-sub">Configure seu álbum de memórias</p>
-                <div class="setup-fields">
-                    <input type="text" id="setup-name1" placeholder="Seu nome" class="input-field">
-                    <input type="text" id="setup-name2" placeholder="Nome do(a) parceiro(a)" class="input-field">
-                    <label class="input-label">Início do relacionamento</label>
-                    <input type="date" id="setup-date" class="input-field">
-                    <button id="setup-btn" class="btn btn-primary">Começar Nossa História</button>
+    <!-- Firebase Setup Overlay -->
+    <div id="firebase-overlay" style="display:none;">
+        <div class="firebase-setup glass-card">
+            <div class="firebase-icon">&#x1F525;</div>
+            <h2>Configurar Firebase</h2>
+            <p>Para sincronizar em tempo real, conecte seu Firebase.</p>
+            <div class="firebase-steps">
+                <div class="firebase-step">
+                    <span class="step-num">1</span>
+                    <span>Acesse <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a> e crie um projeto</span>
+                </div>
+                <div class="firebase-step">
+                    <span class="step-num">2</span>
+                    <span>Em <strong>Realtime Database</strong>, crie um banco e nas regras coloque <code>true</code> para read e write</span>
+                </div>
+                <div class="firebase-step">
+                    <span class="step-num">3</span>
+                    <span>Em <strong>Configuracoes do projeto &gt; Apps</strong>, crie um app Web e copie o objeto <code>firebaseConfig</code></span>
+                </div>
+                <div class="firebase-step">
+                    <span class="step-num">4</span>
+                    <span>Cole os dados abaixo:</span>
                 </div>
             </div>
-            <div id="welcome-display" style="display:none;">
-                <div class="welcome-hearts">💕</div>
-                <h1 id="welcome-names">Nosso Amor</h1>
-                <p class="welcome-sub">Nosso Álbum de Memórias</p>
-                <div id="welcome-counter" class="welcome-counter"></div>
-                <button id="enter-btn" class="btn btn-primary btn-glow">Entrar ❤️</button>
+            <div class="setup-fields" style="margin-top:18px;">
+                <input type="text" id="fb-apiKey" class="input-field" placeholder="apiKey">
+                <input type="text" id="fb-authDomain" class="input-field" placeholder="authDomain">
+                <input type="text" id="fb-databaseURL" class="input-field" placeholder="databaseURL (ex: https://xxx.firebaseio.com)">
+                <input type="text" id="fb-projectId" class="input-field" placeholder="projectId">
+                <input type="text" id="fb-storageBucket" class="input-field" placeholder="storageBucket">
+                <input type="text" id="fb-messagingSenderId" class="input-field" placeholder="messagingSenderId">
+                <input type="text" id="fb-appId" class="input-field" placeholder="appId">
+
+
+
+                <button id="fb-save-btn" class="btn btn-primary" style="margin-top:8px;">Conectar ao Firebase &#x1F525;</button>
             </div>
         </div>
     </div>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" style="display:none;">
+        <div class="welcome-content glass-card">
+            <div id="welcome-loading" class="welcome-loading">
+                <div class="welcome-hearts">&#x1F495;</div>
+                <p class="welcome-sub">Carregando...</p>
+            </div>
 
+
+
+
+            <div id="setup-form" style="display:none;">
+                <h1>Nosso Mural</h1>
+                <p class="welcome-sub">Configure seu mural de memorias</p>
+                <div class="setup-fields">
+                    <input type="text" id="setup-name1" placeholder="Seu nome" class="input-field">
+                    <input type="text" id="setup-name2" placeholder="Nome do(a) parceiro(a)" class="input-field">
+                    <label class="input-label">Inicio do relacionamento</label>
+                    <input type="date" id="setup-date" class="input-field">
+                    <button id="setup-btn" class="btn btn-primary">Comecar Nossa Historia</button>
+                </div>
+            </div>
+            <div id="welcome-display" style="display:none;">
+                <div class="welcome-hearts">&#x1F495;</div>
+                <h1 id="welcome-names">Nosso Amor</h1>
+                <p class="welcome-sub">Nosso Mural de Memorias</p>
+                <div id="welcome-counter" class="welcome-counter"></div>
+                <button id="enter-btn" class="btn btn-primary btn-glow">Entrar</button>
+            </div>
+        </div>
+    </div>
     <!-- Identity Modal -->
     <div id="identity-modal" class="identity-overlay" style="display:none;">
         <div class="identity-modal-content glass-card">
-            <div class="welcome-hearts">👤</div>
-            <h3 class="identity-title">Quem é você?</h3>
+            <div class="welcome-hearts">&#x1F464;</div>
+
+            <h3 class="identity-title">Quem e voce?</h3>
             <p class="identity-subtitle">Identifique-se para que suas postagens fiquem marcadas</p>
             <div class="identity-btns">
                 <button class="identity-btn person-1-hover" id="identity-btn-1" data-person="1">
-                    <span class="identity-btn-icon">💜</span>
+                    <span class="identity-btn-icon">&#x1F49C;</span>
                     <span class="identity-btn-name" id="identity-name-1">Pessoa 1</span>
                 </button>
                 <button class="identity-btn person-2-hover" id="identity-btn-2" data-person="2">
-                    <span class="identity-btn-icon">💖</span>
+                    <span class="identity-btn-icon">&#x1F496;</span>
                     <span class="identity-btn-name" id="identity-name-2">Pessoa 2</span>
                 </button>
             </div>
         </div>
     </div>
-
     <!-- Navbar -->
     <nav id="navbar" class="navbar glass-card" style="display:none;">
-        <div class="nav-brand" id="nav-brand">💕 Nosso Álbum</div>
+        <div class="nav-brand" id="nav-brand">&#x1F495; Nosso Mural</div>
         <button class="hamburger" id="hamburger">
             <span></span><span></span><span></span>
         </button>
         <div class="nav-links" id="nav-links">
-            <a href="#home" class="nav-link active" data-section="home">Início</a>
+            <a href="#home" class="nav-link active" data-section="home">Inicio</a>
             <a href="#galeria" class="nav-link" data-section="galeria">Galeria</a>
-            <a href="#videos" class="nav-link" data-section="videos">Vídeos</a>
+            <a href="#videos" class="nav-link" data-section="videos">Videos</a>
             <a href="#mensagens" class="nav-link" data-section="mensagens">Mensagens</a>
-            <a href="#musica" class="nav-link" data-section="musica">Música</a>
+            <a href="#musica" class="nav-link" data-section="musica">Musica</a>
             <a href="#timeline" class="nav-link" data-section="timeline">Timeline</a>
             <a href="#log" class="nav-link" data-section="log">Atividades</a>
         </div>
@@ -77,114 +118,104 @@
             <div id="identity-indicator" class="identity-indicator" style="display:none;">
                 <span class="identity-dot" id="identity-dot"></span>
                 <span id="identity-name-display"></span>
-                <button id="change-identity-btn" class="change-identity-btn" title="Trocar identidade">✏️</button>
+                <button id="change-identity-btn" class="change-identity-btn" title="Trocar identidade">&#x270F;&#xFE0F;</button>
             </div>
             <button id="dark-mode-toggle" class="theme-toggle" title="Alternar tema">
-                <span id="theme-icon">🌙</span>
+                <span id="theme-icon">&#x1F319;</span>
                 <span id="theme-label">Escuro</span>
             </button>
-            <button id="settings-btn" class="btn-icon" title="Configurações">⚙️</button>
+            <button id="settings-btn" class="btn-icon" title="Configuracoes">&#x2699;&#xFE0F;</button>
         </div>
     </nav>
-
     <!-- Main Content -->
     <main id="main-content" style="display:none;">
-
         <section id="home" class="section">
-            <h2 class="section-title">💕 <span id="home-names">Nosso Amor</span></h2>
+            <h2 class="section-title">&#x1F495; <span id="home-names">Nosso Amor</span></h2>
             <div class="counter-grid" id="counter-grid"></div>
             <div class="stats-grid">
                 <div class="stat-card glass-card"><span class="stat-number" id="stat-photos">0</span><span class="stat-label">Fotos</span></div>
                 <div class="stat-card glass-card"><span class="stat-number" id="stat-messages">0</span><span class="stat-label">Mensagens</span></div>
-                <div class="stat-card glass-card"><span class="stat-number" id="stat-music">0</span><span class="stat-label">Músicas</span></div>
+                <div class="stat-card glass-card"><span class="stat-number" id="stat-music">0</span><span class="stat-label">Musicas</span></div>
             </div>
             <div class="quote-card glass-card">
                 <p id="love-quote" class="love-quote"></p>
             </div>
         </section>
-
         <section id="galeria" class="section">
-            <h2 class="section-title">📸 Galeria de Fotos</h2>
+            <h2 class="section-title">&#x1F4F8; Galeria de Fotos</h2>
             <div class="section-actions glass-card">
                 <label class="btn btn-primary upload-btn">
-                    📷 Adicionar Fotos
+                    &#x1F4F7; Adicionar Fotos
                     <input type="file" id="photo-input" accept="image/*" multiple hidden>
                 </label>
                 <input type="text" id="photo-search" class="input-field input-sm" placeholder="Buscar por legenda...">
                 <div class="filter-btns">
                     <button class="btn btn-sm active" data-filter="all">Todas</button>
-                    <button class="btn btn-sm" data-filter="favorites">⭐ Favoritas</button>
+                    <button class="btn btn-sm" data-filter="favorites">Favoritas</button>
                 </div>
             </div>
             <div id="gallery-grid" class="gallery-grid"></div>
-            <p id="gallery-empty" class="empty-msg" style="display:none;">Nenhuma foto ainda. Adicione suas memórias! 📷</p>
+            <p id="gallery-empty" class="empty-msg" style="display:none;">Nenhuma foto ainda. Adicione suas memorias! &#x1F4F7;</p>
         </section>
-
         <section id="videos" class="section">
-            <h2 class="section-title">🎬 Nossos Vídeos</h2>
+            <h2 class="section-title">&#x1F3AC; Nossos Videos</h2>
             <div class="section-actions glass-card">
                 <input type="url" id="video-url" class="input-field" placeholder="Cole a URL do YouTube aqui...">
-                <input type="text" id="video-title" class="input-field input-sm" placeholder="Título do vídeo (opcional)">
-                <button id="add-video-btn" class="btn btn-primary">Adicionar Vídeo</button>
+                <input type="text" id="video-title" class="input-field input-sm" placeholder="Titulo do video (opcional)">
+                <button id="add-video-btn" class="btn btn-primary">Adicionar Video</button>
             </div>
             <div id="video-grid" class="video-grid"></div>
-            <p id="video-empty" class="empty-msg" style="display:none;">Nenhum vídeo ainda. Adicione um link do YouTube! 🎬</p>
+            <p id="video-empty" class="empty-msg" style="display:none;">Nenhum video ainda. Adicione um link do YouTube! &#x1F3AC;</p>
         </section>
-
         <section id="mensagens" class="section">
-            <h2 class="section-title">💌 Mensagens Especiais</h2>
+            <h2 class="section-title">&#x1F48C; Mensagens Especiais</h2>
             <div class="msg-composer glass-card">
                 <div class="msg-input-wrap">
                     <textarea id="msg-input" class="input-field" placeholder="Escreva uma mensagem especial..." rows="3"></textarea>
-                    <button id="emoji-toggle" class="btn-icon emoji-toggle">😊</button>
+                    <button id="emoji-toggle" class="btn-icon emoji-toggle">&#x1F60A;</button>
                 </div>
                 <div id="emoji-picker" class="emoji-picker" style="display:none;"></div>
-                <button id="send-msg-btn" class="btn btn-primary">Enviar 💌</button>
+                <button id="send-msg-btn" class="btn btn-primary">Enviar &#x1F48C;</button>
             </div>
             <div class="msg-filters">
                 <button class="btn btn-sm active" data-msg-filter="all">Todos</button>
                 <button class="btn btn-sm" data-msg-filter="1" id="msg-filter-1">Pessoa 1</button>
                 <button class="btn btn-sm" data-msg-filter="2" id="msg-filter-2">Pessoa 2</button>
-                <button class="btn btn-sm" data-msg-filter="favorites">⭐ Favoritos</button>
+                <button class="btn btn-sm" data-msg-filter="favorites">Favoritos</button>
             </div>
             <div id="messages-list" class="messages-list"></div>
-            <p id="msg-empty" class="empty-msg" style="display:none;">Nenhuma mensagem ainda. Deixe um recado especial! 💝</p>
+            <p id="msg-empty" class="empty-msg" style="display:none;">Nenhuma mensagem ainda. Deixe um recado especial! &#x1F49D;</p>
         </section>
-
         <section id="musica" class="section">
-            <h2 class="section-title">🎵 Nossa Trilha Sonora</h2>
+            <h2 class="section-title">&#x1F3B5; Nossa Trilha Sonora</h2>
             <div class="section-actions glass-card">
                 <input type="url" id="music-url" class="input-field" placeholder="URL do YouTube ou Spotify...">
-                <input type="text" id="music-title" class="input-field input-sm" placeholder="Nome da música">
-                <button id="add-music-btn" class="btn btn-primary">Adicionar à Playlist</button>
+                <input type="text" id="music-title" class="input-field input-sm" placeholder="Nome da musica">
+                <button id="add-music-btn" class="btn btn-primary">Adicionar a Playlist</button>
             </div>
             <div id="music-player" class="music-player" style="display:none;">
                 <div id="player-container"></div>
             </div>
             <div id="playlist" class="playlist"></div>
-            <p id="music-empty" class="empty-msg" style="display:none;">Nenhuma música ainda. Adicione a trilha sonora do casal! 🎶</p>
+            <p id="music-empty" class="empty-msg" style="display:none;">Nenhuma musica ainda. Adicione a trilha sonora do casal! &#x1F3B6;</p>
         </section>
-
         <section id="timeline" class="section">
-            <h2 class="section-title">📅 Nossa Timeline</h2>
+            <h2 class="section-title">&#x1F4C5; Nossa Timeline</h2>
             <div class="section-actions glass-card">
                 <input type="date" id="timeline-date" class="input-field input-sm">
-                <input type="text" id="timeline-title" class="input-field input-sm" placeholder="Título da memória">
+                <input type="text" id="timeline-title" class="input-field input-sm" placeholder="Titulo da memoria">
                 <textarea id="timeline-desc" class="input-field" placeholder="Descreva esse momento..." rows="2"></textarea>
-                <button id="add-timeline-btn" class="btn btn-primary">Adicionar Memória</button>
+                <button id="add-timeline-btn" class="btn btn-primary">Adicionar Memoria</button>
             </div>
             <div id="timeline-list" class="timeline-list"></div>
-            <p id="timeline-empty" class="empty-msg" style="display:none;">Nenhuma memória na timeline. Registre seus momentos! 📅</p>
+            <p id="timeline-empty" class="empty-msg" style="display:none;">Nenhuma memoria na timeline. Registre seus momentos! &#x1F4C5;</p>
         </section>
-
         <section id="log" class="section">
-            <h2 class="section-title">📋 Log de Atividades</h2>
+            <h2 class="section-title">&#x1F4CB; Log de Atividades</h2>
             <div id="log-list" class="log-list"></div>
             <p id="log-empty" class="empty-msg" style="display:none;">Nenhuma atividade registrada.</p>
         </section>
-
     </main>
-
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" style="display:none;">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
@@ -193,12 +224,11 @@
         <img id="lightbox-img" class="lightbox-img" src="" alt="">
         <p id="lightbox-caption" class="lightbox-caption"></p>
     </div>
-
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content glass-card">
             <div class="modal-header">
-                <h3>⚙️ Configurações</h3>
+                <h3>&#x2699;&#xFE0F; Configuracoes</h3>
                 <button class="modal-close" id="settings-close">&times;</button>
             </div>
             <div class="modal-body">
@@ -216,22 +246,22 @@
                 </div>
                 <div class="setting-actions">
                     <button id="save-settings" class="btn btn-primary">Salvar</button>
+                    <button id="reset-firebase" class="btn btn-danger">Reconfigurar Firebase</button>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
-
     <!-- Floating Hearts Container -->
     <div id="hearts-container" class="hearts-container"></div>
-
     <!-- Footer -->
     <footer id="footer" class="footer" style="display:none;">
-        <p>Feito com ❤️ por <span id="footer-names">Nós</span></p>
+        <p>Feito com &#x2764;&#xFE0F; por <span id="footer-names">Nos</span></p>
     </footer>
-
+    <!-- Firebase SDK (compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
