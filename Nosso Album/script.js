@@ -318,32 +318,74 @@
   /* ==========================================
      GALLERY (photos as base64)
      ========================================== */
+
+  // Compress/resize image to fit within maxDim and target JPEG quality
+  function compressImage(file, maxDim, quality) {
+    maxDim = maxDim || 1600;
+    quality = quality || 0.8;
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = function () { reject(new Error("Erro ao ler arquivo")); };
+      reader.onload = function (ev) {
+        var img = new Image();
+        img.onerror = function () { reject(new Error("Erro ao carregar imagem")); };
+        img.onload = function () {
+          var w = img.width;
+          var h = img.height;
+          // Only resize if larger than maxDim
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          var canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL("image/jpeg", quality);
+          resolve(dataUrl);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function handlePhotoInput(e) {
     var files = e.target.files;
     if (!files || files.length === 0) return;
     if (!currentPerson) { toast("Identifique-se primeiro!", "error"); showIdentityModal(); return; }
 
-    Array.from(files).forEach(function (file) {
-      if (file.size > 800000) {
-        toast("Foto muito grande (max 800KB): " + file.name, "error");
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function (ev) {
+    var fileList = Array.from(files);
+    var total = fileList.length;
+    var uploaded = 0;
+    var failed = 0;
+    toast("Processando " + total + " foto(s)...", "info");
+
+    fileList.forEach(function (file) {
+      compressImage(file, 1600, 0.8).then(function (dataUrl) {
         var photo = {
           id: uid(),
-          src: ev.target.result,
+          src: dataUrl,
           caption: "",
           favorite: false,
           person: currentPerson,
           date: ts()
         };
-        fbPush("photos", photo).then(function () {
-          addLog("\uD83D\uDCF7", "adicionou uma foto");
-          toast("Foto adicionada!", "success");
-        });
-      };
-      reader.readAsDataURL(file);
+        return fbPush("photos", photo);
+      }).then(function () {
+        uploaded++;
+        addLog("\uD83D\uDCF7", "adicionou uma foto");
+        if (uploaded + failed === total) {
+          toast(uploaded === 1 ? "Foto adicionada!" : uploaded + " fotos adicionadas!", "success");
+        }
+      }).catch(function (err) {
+        failed++;
+        toast("Erro ao enviar " + file.name + ": " + err.message, "error");
+        if (uploaded + failed === total && uploaded > 0) {
+          toast(uploaded + " foto(s) adicionada(s) com sucesso.", "success");
+        }
+      });
     });
     e.target.value = "";
   }
