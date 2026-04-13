@@ -47,7 +47,16 @@
      FIREBASE
      ========================================== */
   function getFirebaseConfig() {
-    try { return JSON.parse(localStorage.getItem("fbConfig")); } catch (e) { return null; }
+    return {
+      apiKey: "AIzaSyBiWcEOtg4c5-BwjShrKx-0BxiW3XvavEs",
+      authDomain: "teste-b38b5.firebaseapp.com",
+      databaseURL: "https://teste-b38b5-default-rtdb.firebaseio.com",
+      projectId: "teste-b38b5",
+      storageBucket: "teste-b38b5.firebasestorage.app",
+      messagingSenderId: "404183604492",
+      appId: "1:404183604492:web:18a052b946e0f78097fd29",
+      measurementId: "G-GCCXQF89Z2"
+    };
   }
 
   function saveFirebaseConfig(cfg) {
@@ -1014,15 +1023,8 @@
 
     // Check for saved Firebase config
     var fbCfg = getFirebaseConfig();
-    if (fbCfg && fbCfg.apiKey) {
-      if (initFirebase(fbCfg)) {
-        showWelcomeScreen();
-      } else {
-        showFirebaseOverlay();
-      }
-    } else {
-      showFirebaseOverlay();
-    }
+    initFirebase(fbCfg);
+    showWelcomeScreen();
 
     /* ---------- wire up event listeners ---------- */
 
