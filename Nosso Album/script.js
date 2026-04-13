@@ -1021,9 +1021,11 @@
     initDarkMode();
     initEmojiPicker();
 
-    // Firebase config is hardcoded - always init and go to welcome screen
+    // Firebase config is hardcoded - init and proceed to welcome screen
     var fbCfg = getFirebaseConfig();
-    initFirebase(fbCfg);
+    if (!initFirebase(fbCfg)) {
+      toast("Erro ao conectar ao Firebase. Verifique sua conexao e recarregue a pagina.", "error");
+    }
     showWelcomeScreen();
 
     /* ---------- wire up event listeners ---------- */
