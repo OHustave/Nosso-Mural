@@ -1023,8 +1023,15 @@
 
     // Check for saved Firebase config
     var fbCfg = getFirebaseConfig();
-    initFirebase(fbCfg);
-    showWelcomeScreen();
+    if (fbCfg && fbCfg.apiKey) {
+      if (initFirebase(fbCfg)) {
+        showWelcomeScreen();
+      } else {
+        showFirebaseOverlay();
+      }
+    } else {
+      showFirebaseOverlay();
+    }
 
     /* ---------- wire up event listeners ---------- */
 
