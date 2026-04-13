@@ -770,7 +770,7 @@
     // show player
     var player = $("#music-player");
     var container = $("#player-container");
-    container.innerHTML = '<iframe src="' + embedUrl + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen style="width:100%;height:80px;border:none;border-radius:10px;"></iframe>';
+    container.innerHTML = '<iframe src="' + embedUrl + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
     player.style.display = "";
   }
 
