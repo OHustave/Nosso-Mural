@@ -359,6 +359,7 @@
     var fileList = Array.from(files);
     var total = fileList.length;
     var uploaded = 0;
+    var failed = 0;
     toast("Processando " + total + " foto(s)...", "info");
 
     fileList.forEach(function (file) {
@@ -375,12 +376,15 @@
       }).then(function () {
         uploaded++;
         addLog("\uD83D\uDCF7", "adicionou uma foto");
-        if (uploaded === total) {
-          toast(total === 1 ? "Foto adicionada!" : total + " fotos adicionadas!", "success");
+        if (uploaded + failed === total) {
+          toast(uploaded === 1 ? "Foto adicionada!" : uploaded + " fotos adicionadas!", "success");
         }
       }).catch(function (err) {
-        uploaded++;
+        failed++;
         toast("Erro ao enviar " + file.name + ": " + err.message, "error");
+        if (uploaded + failed === total && uploaded > 0) {
+          toast(uploaded + " foto(s) adicionada(s) com sucesso.", "success");
+        }
       });
     });
     e.target.value = "";
