@@ -1021,9 +1021,9 @@
     initDarkMode();
     initEmojiPicker();
 
-    // Check for saved Firebase config
+    // Firebase config is hardcoded - init and proceed to welcome screen
     var fbCfg = getFirebaseConfig();
-    initFirebase(fbCfg);
+    initFirebase(fbCfg); // initFirebase already shows a toast on failure
     showWelcomeScreen();
 
     /* ---------- wire up event listeners ---------- */
